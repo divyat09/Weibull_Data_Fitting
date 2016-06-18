@@ -15,12 +15,10 @@ mean_theta=0;
 
 %Generating Sample Data
 for i=1:N
-	data(i)=wblrnd(10,1,1);
+	data(i)=exprnd(10,1,1);
 end
 
-for(k=1;k<=N;k++){
-
-	
+for k=1:N
 	%Calculating beta
 	data=sort(data);
 	for i=1:r
@@ -32,14 +30,26 @@ for(k=1;k<=N;k++){
 	c=data(r);
 	y2= ((N-r)*log(c)*(c.^x)+sum1)./((N-r)*(c.^x)+sum2) - (sum3/r); 
 	plot(x,y1,x,y2);
-	%beta=intersection(x,y1,x,y2);
-	beta=fzero(y2-y1,0);
+
+	
+	
+%Calculating Value of Beta
+	syms z;
+	for i=1:r
+		t=data(i);
+		sum1=sum1+(t^z)*log(t);
+		sum2=sum2+t^z;
+		sum3=sum3+log(t);
+	end
+	c=data(r);
+	f= @(z)(((N-r)*log(c)*(c^z)+sum1)/((N-r)*(c^z)+sum2) - (sum3/r)-(1/z)); 
+	beta=fsolve(f,0.);
 	mean_beta=mean_beta+beta;
 
 	%Calculating theta
 	theta= (1.*(sum2/N))^(1/beta);
 	mean_theta=mean_theta+theta;
-}
+end
 
 mean_theta=mean_theta/N;
 mean_beta=mean_beta/N;
